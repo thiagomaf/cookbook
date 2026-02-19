@@ -49,6 +49,21 @@
             </div>
           </div>
           <Button label="Save GitHub Settings" icon="pi pi-save" outlined @click="saveGitHub" :loading="savingGitHub" />
+          <template v-if="auth.user?.github_repo_url && auth.user?.has_github_token">
+            <Divider />
+            <p style="font-size: 0.875rem; color: var(--p-text-muted-color); margin: 0">
+              Import recipes from your GitHub repo that aren't yet in the app.
+            </p>
+            <Button label="Sync from GitHub" icon="pi pi-sync" outlined @click="syncFromGitHub" :loading="syncing" />
+            <Message v-if="syncResult" :severity="syncSeverity" :closable="true" @close="syncResult = null">
+              <div>{{ syncSummary }}</div>
+              <ul v-if="syncResult.failed.length" style="margin: 0.5rem 0 0; padding-left: 1.2rem">
+                <li v-for="f in syncResult.failed" :key="f.file" style="font-size: 0.8rem">
+                  {{ f.file }}: {{ f.error }}
+                </li>
+              </ul>
+            </Message>
+          </template>
         </div>
       </template>
     </Card>
@@ -75,15 +90,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { authApi } from '@/api/auth'
+import type { SyncResult } from '@/types'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
+import Divider from 'primevue/divider'
 import InputText from 'primevue/inputtext'
+import Message from 'primevue/message'
 import Password from 'primevue/password'
 import Slider from 'primevue/slider'
-import Message from 'primevue/message'
 
 const auth = useAuthStore()
 
@@ -95,6 +112,27 @@ const successMsg = ref('')
 const savingEmail = ref(false)
 const savingGitHub = ref(false)
 const savingPrefs = ref(false)
+const syncing = ref(false)
+const syncResult = ref<SyncResult | null>(null)
+
+const syncSeverity = computed(() => {
+  if (!syncResult.value) return 'info'
+  if (syncResult.value.error) return 'error'
+  if (syncResult.value.failed.length > 0) return 'warn'
+  if (syncResult.value.imported.length > 0) return 'success'
+  return 'info'
+})
+
+const syncSummary = computed(() => {
+  if (!syncResult.value) return ''
+  const r = syncResult.value
+  if (r.error) return r.error
+  const parts: string[] = []
+  if (r.imported.length) parts.push(`Imported ${r.imported.length} recipe(s)`)
+  if (r.skipped.length) parts.push(`Skipped ${r.skipped.length} (already exist)`)
+  if (r.failed.length) parts.push(`${r.failed.length} failed`)
+  return parts.join('. ') || 'No new recipes found in repository.'
+})
 
 function flash(msg: string) { successMsg.value = msg; setTimeout(() => successMsg.value = '', 3000) }
 
@@ -112,7 +150,7 @@ async function saveGitHub() {
       github_token: githubToken.value || undefined
     })
     githubToken.value = ''
-    flash('GitHub settings saved')
+    flash('GitHub settings saved. Recipes will be imported in the background.')
   } finally { savingGitHub.value = false }
 }
 
@@ -120,5 +158,22 @@ async function savePrefs() {
   savingPrefs.value = true
   try { auth.user = await authApi.updateMe({ tweak_percentage: tweakPct.value }); flash('Preferences saved') }
   finally { savingPrefs.value = false }
+}
+
+async function syncFromGitHub() {
+  syncing.value = true
+  syncResult.value = null
+  try {
+    syncResult.value = await authApi.syncGitHub()
+  } catch (e: any) {
+    syncResult.value = {
+      imported: [],
+      skipped: [],
+      failed: [],
+      error: e.response?.data?.detail ?? 'Sync failed'
+    }
+  } finally {
+    syncing.value = false
+  }
 }
 </script>

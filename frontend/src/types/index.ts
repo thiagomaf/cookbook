@@ -77,6 +77,18 @@ export interface RecipeDetailOut extends RecipeOut {
   versions: RecipeVersionOut[]
 }
 
+export interface SyncFailedItem {
+  file: string
+  error: string
+}
+
+export interface SyncResult {
+  imported: string[]
+  skipped: string[]
+  failed: SyncFailedItem[]
+  error: string | null
+}
+
 export interface CategoryOut { id: number; name: string }
 export interface TagOut { id: number; name: string }
 

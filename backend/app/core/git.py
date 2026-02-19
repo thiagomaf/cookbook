@@ -93,6 +93,53 @@ def delete_recipe(user_id: int, slug: str) -> str | None:
     return commit.hexsha
 
 
+def clone_or_pull(user_id: int, repo_url: str, github_token: str) -> gitpython.Repo:
+    """
+    Ensure the local repo mirrors the remote.
+
+    - No local repo → clone from remote.
+    - Local repo exists → fetch + merge from remote.
+
+    Returns the Repo object.
+    Raises gitpython.GitCommandError on unrecoverable network/auth failures.
+    """
+    path = _repo_path(user_id)
+    clean_url = repo_url.rstrip("/").removesuffix(".git")
+    parsed = urlparse(clean_url)
+    auth_url = f"https://x-access-token:{github_token}@{parsed.netloc}{parsed.path}.git"
+
+    if not (path / ".git").exists():
+        path.mkdir(parents=True, exist_ok=True)
+        try:
+            repo = gitpython.Repo.clone_from(auth_url, path)
+        except gitpython.GitCommandError as exc:
+            msg = str(exc).lower()
+            if "empty repository" in msg or "does not appear to be a git repository" in msg:
+                # Remote is empty — initialise locally instead
+                return _ensure_repo(user_id)
+            raise
+        (path / "recipes").mkdir(exist_ok=True)
+        return repo
+
+    # Existing local repo — update remote URL then fetch + merge
+    repo = gitpython.Repo(path)
+    if "origin" in [r.name for r in repo.remotes]:
+        repo.remote("origin").set_url(auth_url)
+    else:
+        repo.create_remote("origin", auth_url)
+
+    try:
+        repo.remote("origin").fetch()
+        remote_refs = [ref.name for ref in repo.remote("origin").refs]
+        if "origin/main" in remote_refs:
+            repo.git.merge("origin/main", allow_unrelated_histories=True)
+    except gitpython.GitCommandError as exc:
+        log.warning("Fetch/merge failed for user %s: %s", user_id, exc)
+
+    (path / "recipes").mkdir(exist_ok=True)
+    return repo
+
+
 def push_to_github(user_id: int, repo_url: str, github_token: str) -> bool:
     """
     Push local commits to GitHub using a Personal Access Token.

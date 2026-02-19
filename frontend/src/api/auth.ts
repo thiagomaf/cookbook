@@ -1,5 +1,5 @@
 import client from './client'
-import type { UserPublic } from '@/types'
+import type { SyncResult, UserPublic } from '@/types'
 
 export const authApi = {
   async register(username: string, email: string, password: string) {
@@ -22,5 +22,9 @@ export const authApi = {
   }) {
     const { data } = await client.patch('/users/me', payload)
     return data as UserPublic
+  },
+  async syncGitHub() {
+    const { data } = await client.post<SyncResult>('/sync/')
+    return data
   }
 }

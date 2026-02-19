@@ -33,7 +33,9 @@ frontend/dist/
 frontend/.vite/
 
 # --- Docker ------------------------------------------------------------------
-# Override files for local tweaks (not committed)
+# docker-compose.yml contains NAS-specific absolute paths — manage it directly
+# in Container Station. Keep a local copy outside the repo.
+docker-compose.yml
 docker-compose.override.yml
 
 # --- IDE & OS ----------------------------------------------------------------
