@@ -1,0 +1,50 @@
+# =============================================================================
+# Cookbook — .gitignore
+# =============================================================================
+
+# --- Environment & Secrets ---------------------------------------------------
+.env
+!.env.example
+backend/.env
+!backend/.env.example
+
+# --- Runtime Data (volumes) --------------------------------------------------
+# SQLite database and per-user git repos are runtime artefacts, not source code
+data/
+
+# --- Python ------------------------------------------------------------------
+backend/.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Node / Frontend ---------------------------------------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# --- Docker ------------------------------------------------------------------
+# Override files for local tweaks (not committed)
+docker-compose.override.yml
+
+# --- IDE & OS ----------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Alembic -----------------------------------------------------------------
+# Keep migrations tracked; ignore only generated artefacts
+alembic/__pycache__/
