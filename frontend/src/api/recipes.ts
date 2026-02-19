@@ -3,7 +3,7 @@ import type { CategoryOut, DiffOut, RecipeContent, RecipeDetailOut, RecipeOut, R
 
 export const recipesApi = {
   async list(params?: { search?: string; category?: string; tag?: string; page?: number }) {
-    const { data } = await client.get<RecipeDetailOut[]>('/recipes', { params })
+    const { data } = await client.get<RecipeDetailOut[]>('/recipes/', { params })
     return data
   },
   async listShared(params?: { search?: string; page?: number }) {
@@ -15,7 +15,7 @@ export const recipesApi = {
     return data
   },
   async create(content: RecipeContent) {
-    const { data } = await client.post<RecipeDetailOut>('/recipes', { content })
+    const { data } = await client.post<RecipeDetailOut>('/recipes/', { content })
     return data
   },
   async updateDraft(id: number, content: RecipeContent) {
