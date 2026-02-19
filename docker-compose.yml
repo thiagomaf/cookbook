@@ -1,35 +1,38 @@
 services:
   backend:
     build: ./backend
+    #image: cookbook-backend:latest
     expose:
       - "8000"
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data                        # use absolute path for Container Station
     env_file:
-      - ./backend/.env
+      - ./backend/.env                          # use absolute path for Container Station
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
-    networks:
-      - internal
 
   frontend:
     build: ./frontend
+    #image: cookbook-frontend:latest
     hostname: cookbook
     depends_on:
       backend:
         condition: service_healthy
     restart: unless-stopped
-    networks:
-      - internal
-      - lan
 
-networks:
-  internal:
-    driver: bridge
-  lan:
-    external: true
-    name: qnet-dhcp-eth0-6d6da6
+# Network notes:
+#   By default both services share the compose-managed bridge (backend ↔ frontend).
+#   To expose the frontend on the LAN with its own IP, either:
+#     - assign a network adapter via Container Station UI (QNAP), or
+#     - uncomment the networks block below and add 'networks: [internal, lan]' to frontend.
+#
+#networks:
+#  internal:
+#    driver: bridge
+#  lan:
+#    external: true
+#    name: qnet-dhcp-eth0-6d6da6          # QNAP qnet DHCP network

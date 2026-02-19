@@ -138,7 +138,7 @@ The YAML structure is intentionally flexible — additional metadata fields can 
 
 - **Docker**: single `docker-compose` setup (app + SQLite volume).
 - **Networking**: bridge mode with a static LAN IP address.
-- **External access**: Cloudflare Tunnel → `cookbook.raidermaf.online`.
+- **External access**: Cloudflare Tunnel → custom subdomain.
 - **GitHub integration**: the app manages each user's git repo autonomously (commit, push). No manual git interaction required.
 
 ### App Configuration (settable via UI)
