@@ -79,6 +79,7 @@ class RecipeOut(BaseModel):
     slug: str
     title: str
     owner_id: int
+    owner_username: str
     is_shared: bool
     has_draft: bool
     forked_from_attribution: Optional[str]
