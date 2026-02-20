@@ -72,7 +72,7 @@ class Recipe(Base):
     )
 
     owner: Mapped["User"] = relationship(  # type: ignore[name-defined]
-        "User", back_populates="recipes", foreign_keys=[owner_id]
+        "User", back_populates="recipes", foreign_keys=[owner_id], lazy="selectin"
     )
     versions: Mapped[list["RecipeVersion"]] = relationship(
         "RecipeVersion", back_populates="recipe", order_by="RecipeVersion.version_number"

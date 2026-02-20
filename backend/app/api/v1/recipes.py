@@ -64,6 +64,20 @@ def _build_detail(recipe: Recipe) -> RecipeDetailOut:
     )
 
 
+def _build_simple(recipe: Recipe) -> RecipeOut:
+    return RecipeOut(
+        id=recipe.id,
+        slug=recipe.slug,
+        title=recipe.title,
+        owner_id=recipe.owner_id,
+        owner_username=recipe.owner.username,
+        is_shared=recipe.is_shared,
+        has_draft=recipe.has_draft,
+        forked_from_attribution=recipe.forked_from_attribution,
+        created_at=recipe.created_at,
+        updated_at=recipe.updated_at,
+    )
+
 async def _push_background(
     version_id: int,
     user_id: int,
@@ -135,19 +149,7 @@ def update_recipe_meta(
     db: Session = Depends(get_db),
 ):
     recipe = _get_own_or_404(db, recipe_id, current_user)
-    updated = crud.update_meta(db, recipe, body.is_shared)
-    return RecipeOut(
-        id=updated.id,
-        slug=updated.slug,
-        title=updated.title,
-        owner_id=updated.owner_id,
-        owner_username=updated.owner.username,
-        is_shared=updated.is_shared,
-        has_draft=updated.has_draft,
-        forked_from_attribution=updated.forked_from_attribution,
-        created_at=updated.created_at,
-        updated_at=updated.updated_at,
-    )
+    return _build_simple(crud.update_meta(db, recipe, body.is_shared))
 
 
 @router.delete("/{recipe_id}", status_code=status.HTTP_204_NO_CONTENT)
