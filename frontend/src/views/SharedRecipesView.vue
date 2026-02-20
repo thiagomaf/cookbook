@@ -22,7 +22,9 @@
         :key="recipe.id"
         :recipe="recipe"
         :showOwner="true"
+        :showForkButton="true"
         @click="router.push(`/recipes/${recipe.id}`)"
+        @fork="handleFork"
       />
     </div>
   </div>
@@ -31,6 +33,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
 import { recipesApi } from '@/api/recipes'
 import type { RecipeDetailOut } from '@/types'
 import RecipeCard from '@/components/RecipeCard.vue'
@@ -40,9 +43,11 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 
 const router = useRouter()
+const toast = useToast()
 const recipes = ref<RecipeDetailOut[]>([])
 const loading = ref(false)
 const search = ref('')
+const forking = ref<number | null>(null)
 
 let timer: ReturnType<typeof setTimeout>
 function debouncedLoad() { clearTimeout(timer); timer = setTimeout(load, 400) }
@@ -55,5 +60,19 @@ async function load() {
     loading.value = false
   }
 }
+
+async function handleFork(recipe: RecipeDetailOut) {
+  forking.value = recipe.id
+  try {
+    const forked = await recipesApi.fork(recipe.id)
+    toast.add({ severity: 'success', summary: 'Forked!', detail: 'Added to your cookbook', life: 3000 })
+    router.push(`/recipes/${forked.id}/edit`)
+  } catch {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to fork', life: 3000 })
+  } finally {
+    forking.value = null
+  }
+}
+
 onMounted(load)
 </script>
