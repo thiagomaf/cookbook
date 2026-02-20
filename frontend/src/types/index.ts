@@ -64,6 +64,7 @@ export interface RecipeOut {
   slug: string
   title: string
   owner_id: number
+  owner_username: string
   is_shared: boolean
   has_draft: boolean
   forked_from_attribution: string | null

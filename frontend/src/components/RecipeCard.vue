@@ -38,7 +38,7 @@
     </div>
 
     <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: var(--p-text-muted-color)">
-      <span v-if="showOwner">by user {{ recipe.owner_id }}</span>
+      <span v-if="showOwner">by @{{ recipe.owner_username }}</span>
       <span v-else>{{ formatDate(recipe.updated_at) }}</span>
       <div style="display: flex; gap: 0.3rem">
         <Tag v-if="recipe.is_shared" icon="pi pi-users" severity="info" style="font-size: 0.7rem" v-tooltip.top="'Shared'" />
