@@ -4,7 +4,8 @@ import Aura from '@primeuix/themes/aura'
 /**
  * CookbookPreset — extends Aura with:
  * - Primary: teal (replaces default emerald)
- * - Surface: stone warm-gray (replaces slate in light, zinc in dark)
+ * - Surface: stone warm-gray in both schemes; dark mode inverts the scale
+ *   so surface.0 is the darkest (component backgrounds) and 950 is lightest
  * - Border radius: slightly larger (md = 10px, lg = 14px)
  */
 export const CookbookPreset = definePreset(Aura, {
@@ -50,19 +51,21 @@ export const CookbookPreset = definePreset(Aura, {
         },
       },
       dark: {
+        // Inverted scale: low numbers = dark (component backgrounds),
+        // high numbers = light (text, borders on dark surfaces).
         surface: {
-          0:   '#ffffff',
-          50:  '{stone.50}',
-          100: '{stone.100}',
-          200: '{stone.200}',
-          300: '{stone.300}',
-          400: '{stone.400}',
-          500: '{stone.500}',
-          600: '{stone.600}',
-          700: '{stone.700}',
-          800: '{stone.800}',
-          900: '{stone.900}',
-          950: '{stone.950}',
+          0:   '{stone.950}',
+          50:  '{stone.900}',
+          100: '{stone.800}',
+          200: '{stone.700}',
+          300: '{stone.600}',
+          400: '{stone.500}',
+          500: '{stone.400}',
+          600: '{stone.300}',
+          700: '{stone.200}',
+          800: '{stone.100}',
+          900: '{stone.50}',
+          950: '#ffffff',
         },
       },
     },
