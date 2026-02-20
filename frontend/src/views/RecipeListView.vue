@@ -52,7 +52,9 @@
         v-for="recipe in recipes"
         :key="recipe.id"
         :recipe="recipe"
+        :showShareToggle="true"
         @click="router.push(`/recipes/${recipe.id}`)"
+        @toggle-share="handleToggleShare"
       />
     </div>
   </div>
@@ -74,6 +76,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 import { recipesApi } from '@/api/recipes'
 import type { RecipeDetailOut } from '@/types'
 import { emptyContent } from '@/types'
@@ -88,6 +91,7 @@ import InputIcon from 'primevue/inputicon'
 
 const router = useRouter()
 const toast = useToast()
+const confirm = useConfirm()
 
 const recipes = ref<RecipeDetailOut[]>([])
 const loading = ref(false)
@@ -138,6 +142,40 @@ async function createRecipe() {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create recipe', life: 3000 })
   } finally {
     creating.value = false
+  }
+}
+
+function handleToggleShare(recipe: RecipeDetailOut) {
+  if (recipe.is_shared) {
+    confirm.require({
+      message: 'Make this recipe private? Other users will no longer be able to view or fork it.',
+      header: 'Make Private',
+      icon: 'pi pi-lock',
+      acceptLabel: 'Make Private',
+      rejectLabel: 'Cancel',
+      accept: () => doToggleShare(recipe),
+    })
+  } else {
+    doToggleShare(recipe)
+  }
+}
+
+async function doToggleShare(recipe: RecipeDetailOut) {
+  try {
+    await recipesApi.updateMeta(recipe.id, { is_shared: !recipe.is_shared })
+    // Optimistic update — flip the flag in the local list
+    const idx = recipes.value.findIndex(r => r.id === recipe.id)
+    if (idx !== -1) {
+      recipes.value[idx] = { ...recipes.value[idx], is_shared: !recipe.is_shared }
+    }
+    toast.add({
+      severity: 'success',
+      summary: 'Updated',
+      detail: recipe.is_shared ? 'Now private' : 'Now shared',
+      life: 2500,
+    })
+  } catch {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update', life: 3000 })
   }
 }
 
