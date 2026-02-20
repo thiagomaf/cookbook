@@ -23,7 +23,7 @@
 
 | Layer | Technology |
 |---|---|
-| Frontend | Vue 3 + Vite + PrimeVue 4 |
+| Frontend | Vue 3 + Vite + PrimeVue 4 (custom Aura preset — Cormorant + Plus Jakarta Sans, teal accent, light/dark) |
 | State / HTTP | Pinia + Axios |
 | Backend | FastAPI (Python 3.12) |
 | ORM / DB | SQLAlchemy 2 + SQLite (swappable to PostgreSQL) |
@@ -244,6 +244,7 @@ alembic upgrade head
 ## Roadmap
 
 ### Near-term
+- [ ] **Frontend redesign foundation** — custom PrimeVue preset, Cormorant + Plus Jakarta Sans typography, light/dark mode toggle, mobile bottom tab bar ([design doc](docs/plans/2026-02-20-frontend-redesign-design.md))
 - [ ] Photo uploads — multipart endpoint + local/S3 storage
 - [ ] Push status UI — surface git push status (pending / pushed / failed) per version
 - [ ] Alembic on startup — replace `create_all` with `alembic upgrade head` in the entrypoint

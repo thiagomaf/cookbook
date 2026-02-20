@@ -1,5 +1,6 @@
 <template>
   <div style="display: flex; height: 100vh; overflow: hidden; background: var(--p-surface-50)">
+    <ConfirmDialog />
     <!-- Sidebar -->
     <aside style="
       width: 220px;
@@ -55,6 +56,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Button from 'primevue/button'
+import ConfirmDialog from 'primevue/confirmdialog'
 
 const route = useRoute()
 const router = useRouter()
