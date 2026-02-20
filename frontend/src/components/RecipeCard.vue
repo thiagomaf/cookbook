@@ -62,6 +62,8 @@
           size="small"
           severity="secondary"
           style="font-size: 0.75rem; padding: 0.2rem 0.4rem"
+          :loading="forkLoading"
+          :disabled="forkLoading"
           @click.stop="emit('fork', recipe)"
         />
       </div>
@@ -82,6 +84,7 @@ defineProps<{
   showOwner?: boolean
   showShareToggle?: boolean
   showForkButton?: boolean
+  forkLoading?: boolean
 }>()
 
 const emit = defineEmits<{

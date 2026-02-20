@@ -23,6 +23,7 @@
         :recipe="recipe"
         :showOwner="true"
         :showForkButton="true"
+        :forkLoading="forking === recipe.id"
         @click="router.push(`/recipes/${recipe.id}`)"
         @fork="handleFork"
       />
