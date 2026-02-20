@@ -8,7 +8,10 @@
     <div style="flex: 1; overflow-y: auto; padding: 1.5rem">
       <!-- Breadcrumb -->
       <div style="font-size: 0.85rem; color: var(--p-text-muted-color); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem">
-        <RouterLink to="/recipes" style="color: var(--p-primary-color); text-decoration: none">My Recipes</RouterLink>
+        <RouterLink
+          :to="isOwner ? '/recipes' : '/shared'"
+          style="color: var(--p-primary-color); text-decoration: none"
+        >{{ isOwner ? 'My Recipes' : 'Shared Recipes' }}</RouterLink>
         <i class="pi pi-angle-right" style="font-size: 0.75rem"></i>
         <span>{{ recipe.title }}</span>
       </div>
@@ -128,6 +131,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 import { useAuthStore } from '@/stores/auth'
 import { recipesApi } from '@/api/recipes'
 import type { RecipeDetailOut, RecipeContent } from '@/types'
@@ -141,6 +145,7 @@ import ProgressSpinner from 'primevue/progressspinner'
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+const confirm = useConfirm()
 const auth = useAuthStore()
 
 const recipe = ref<RecipeDetailOut | null>(null)
@@ -170,14 +175,35 @@ async function load() {
   }
 }
 
-async function toggleShare() {
+async function doToggleShare() {
   if (!recipe.value) return
   try {
     await recipesApi.updateMeta(recipe.value.id, { is_shared: !recipe.value.is_shared })
     await load()
-    toast.add({ severity: 'success', summary: 'Updated', detail: recipe.value.is_shared ? 'Now private' : 'Now shared', life: 2500 })
+    toast.add({
+      severity: 'success',
+      summary: 'Updated',
+      detail: recipe.value.is_shared ? 'Now shared' : 'Now private',
+      life: 2500,
+    })
   } catch {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update', life: 3000 })
+  }
+}
+
+async function toggleShare() {
+  if (!recipe.value) return
+  if (recipe.value.is_shared) {
+    confirm.require({
+      message: 'Make this recipe private? Other users will no longer be able to view or fork it.',
+      header: 'Make Private',
+      icon: 'pi pi-lock',
+      acceptLabel: 'Make Private',
+      rejectLabel: 'Cancel',
+      accept: doToggleShare,
+    })
+  } else {
+    await doToggleShare()
   }
 }
 
