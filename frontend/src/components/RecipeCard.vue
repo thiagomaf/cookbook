@@ -14,7 +14,7 @@
     @click="emit('click')"
   >
     <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem">
-      <h3 style="margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.35; flex: 1">{{ recipe.title }}</h3>
+      <h3 style="margin: 0; font-size: 1.15rem; font-weight: 600; line-height: 1.3; flex: 1; font-family: var(--font-display); letter-spacing: -0.01em">{{ recipe.title }}</h3>
       <Tag
         v-if="recipe.has_draft"
         icon="pi pi-pencil"
