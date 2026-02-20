@@ -51,21 +51,23 @@ export const CookbookPreset = definePreset(Aura, {
         },
       },
       dark: {
-        // Inverted scale: low numbers = dark (component backgrounds),
-        // high numbers = light (text, borders on dark surfaces).
+        // Aura dark mode convention: surface.0 = white (text colour),
+        // surface.900/950 = dark (card/input backgrounds).
+        // Stone values at matching positions mirror zinc in the default Aura
+        // dark theme — warm undertone instead of cool gray.
         surface: {
-          0:   '{stone.950}',
-          50:  '{stone.900}',
-          100: '{stone.800}',
-          200: '{stone.700}',
-          300: '{stone.600}',
-          400: '{stone.500}',
-          500: '{stone.400}',
-          600: '{stone.300}',
-          700: '{stone.200}',
-          800: '{stone.100}',
-          900: '{stone.50}',
-          950: '#ffffff',
+          0:   '#ffffff',
+          50:  '{stone.50}',
+          100: '{stone.100}',
+          200: '{stone.200}',
+          300: '{stone.300}',
+          400: '{stone.400}',
+          500: '{stone.500}',
+          600: '{stone.600}',
+          700: '{stone.700}',
+          800: '{stone.800}',
+          900: '{stone.900}',
+          950: '{stone.950}',
         },
       },
     },
