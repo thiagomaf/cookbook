@@ -261,9 +261,3 @@ alembic upgrade head
 - [ ] Background task queue — Celery + Redis for reliable async GitHub push
 - [ ] Rate limiting on auth endpoints
 - [ ] Admin panel for the instance owner
-
----
-
-## License
-
-Private project.
